@@ -14,20 +14,12 @@ public class GunTurret extends Turret {
 
 	public GunTurret(int x, int y) {
 		super(x, y);
-		locX = x;
-		locY = y;
 		range = 170;
 		total_cost += 20;
 	}
 	
 	public String turretType(){
 		return "Gun";
-	}
-	
-	
-	public void updateTurretPosition(int x, int y){
-		locX = x-size/2;
-		locY = y-size/2;
 	}
 	
 	public void sell(){
