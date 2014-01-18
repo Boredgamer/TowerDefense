@@ -9,18 +9,10 @@ public class RayTurret extends Turret {
 		//Increases damage and attack speed over time 
 		//Doubles amount of beams 
 
-	private int range;
-	private Color color;
-
 	public RayTurret(int x, int y) {
 		super(x, y);
 		range = 160;
-	}
-	
-	public int buy(){
-		int cost = 40;
-		total_cost += cost;
-		return cost;
+		initialCost = 40;
 	}
 	
 	public String turretType(){
@@ -41,7 +33,7 @@ public class RayTurret extends Turret {
 	}
 	
 	public int moneyBack(){
-		return (int)total_cost*(4/5);
+		return (int)totalCost*(4/5);
 	}
 	
 	public void changeFocus(boolean focus){

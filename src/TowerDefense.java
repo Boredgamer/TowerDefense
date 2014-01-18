@@ -24,7 +24,7 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 	//Title
 	private Player player;
 	private String playerName;
-	private int player_race = 2;
+	private int playerRace = 2;
 	private static int EARTH = 0;
 	private static int WATER = 1;
 	private static int AIR = 2;
@@ -46,7 +46,6 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 	
 	//Invasion
 	private MapGeneration environment;
-	
 	
 	private JFrame frame = new JFrame();
 	private JPanel textBox = new JPanel();
@@ -101,7 +100,7 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 		textBox.remove(prologueText);
 		//textBox.setLayout(new BorderLayout());
 		
-		player = new Player(player_race);
+		player = new Player(playerRace);
 		lifeAndMoneyDisplay = new JLabel("Lives: <3 "+player.getLives()+"\nGold: $ "+player.getGold(), SwingConstants.RIGHT);
 		
 		environment = new MapGeneration();
@@ -118,7 +117,7 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 		glassDisplay[1] = new BombTurret(650, 100);
 		glassDisplay[2] = new RayTurret(690, 100);
 		glassDisplay[3] = new ComTurret(730, 100);
-		glassDisplay[4] = new RacialTurret(player_race, 770, 100);
+		glassDisplay[4] = new RacialTurret(playerRace, 770, 100);
 		
 		bottomButtons[0] = new JButton("Easy");
 		bottomButtons[1] = new JButton("Normal");
@@ -341,7 +340,7 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 						turretBuilder.add(new ComTurret(mX-13, mY-13));
 					}
 					else if (glassDisplay[loop].turretType() == "Racial"){
-						turretBuilder.add(new RacialTurret(player_race, mX-13, mY-13));
+						turretBuilder.add(new RacialTurret(playerRace, mX-13, mY-13));
 					}
 					if (turretBuilder.get(turretsPlaced).buy() > player.getGold()){
 
@@ -392,7 +391,7 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 						turretBuilder.add(new ComTurret(mX-13, mY-13));
 					}
 					else{
-						turretBuilder.add(new RacialTurret(player_race, mX-13, mY-13));
+						turretBuilder.add(new RacialTurret(playerRace, mX-13, mY-13));
 					}
 					if (turretBuilder.get(turretsPlaced).buy() > player.getGold()){
 

@@ -4,19 +4,11 @@ import java.awt.Rectangle;
 
 
 public class BombTurret extends Turret {
-	
-	private int range;
-	private Color color;
 
 	public BombTurret(int x, int y) {
 		super(x, y);
 		range = 190;
-	}
-	
-	public int buy(){
-		int cost = 30;
-		total_cost += cost;
-		return cost;
+		initialCost = 30;
 	}
 	
 	public String turretType(){
@@ -37,7 +29,7 @@ public class BombTurret extends Turret {
 	}
 	
 	public int moneyBack(){
-		return (int)total_cost*(4/5);
+		return (int)totalCost*(4/5);
 	}
 	
 	public void changeFocus(boolean focus){

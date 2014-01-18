@@ -8,14 +8,11 @@ public class GunTurret extends Turret {
 	//Gun (Basic turret)
 		//Rapid Fire, Faster attack speed
 		//Sniper, Much Longer Range, Piereces
-	
-	private int range;
-	private Color color;
 
 	public GunTurret(int x, int y) {
 		super(x, y);
 		range = 170;
-		total_cost += 20;
+		initialCost = 20;
 	}
 	
 	public String turretType(){
@@ -36,7 +33,7 @@ public class GunTurret extends Turret {
 	}
 	
 	public int moneyBack(){
-		return (int)total_cost*(4/5);
+		return (int)totalCost*(4/5);
 	}
 	
 	public void changeFocus(boolean focus){
