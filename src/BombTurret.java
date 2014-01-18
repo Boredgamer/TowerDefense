@@ -10,8 +10,6 @@ public class BombTurret extends Turret {
 
 	public BombTurret(int x, int y) {
 		super(x, y);
-		locX = x;
-		locY = y;
 		range = 190;
 	}
 	
@@ -23,11 +21,6 @@ public class BombTurret extends Turret {
 	
 	public String turretType(){
 		return "Bomb";
-	}
-	
-	public void updateTurretPosition(int x, int y){
-		locX = x-size/2;
-		locY = y-size/2;
 	}
 	
 	public void sell(){

@@ -23,8 +23,6 @@ public class RacialTurret extends Turret {
 	public RacialTurret(int pRace, int x, int y) {
 		super(x, y);
 		playerRace = pRace;
-		locX = x;
-		locY = y;
 		range = 160;
 	}
 	
@@ -36,11 +34,6 @@ public class RacialTurret extends Turret {
 	
 	public String turretType(){
 		return "Racial";
-	}
-	
-	public void updateTurretPosition(int x, int y){
-		locX = x-size/2;
-		locY = y-size/2;
 	}
 	
 	public void sell(){

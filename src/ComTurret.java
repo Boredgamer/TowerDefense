@@ -15,8 +15,6 @@ public class ComTurret extends Turret {
 
 	public ComTurret(int x, int y) {
 		super(x, y);
-		locX = x;
-		locY = y;
 		range = 220;
 	}
 	
@@ -28,11 +26,6 @@ public class ComTurret extends Turret {
 	
 	public String turretType(){
 		return "Com";
-	}
-	
-	public void updateTurretPosition(int x, int y){
-		locX = x-size/2;
-		locY = y-size/2;
 	}
 	
 	public void sell(){
