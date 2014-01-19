@@ -14,7 +14,7 @@ import java.awt.event.*;
 import java.util.ArrayList;
 
 
-public class Tower_Defense extends JPanel implements ActionListener, MouseListener, MouseMotionListener{
+public class TowerDefense extends JPanel implements ActionListener, MouseListener, MouseMotionListener{
 
 	private int phase = 2;
 	private static int TITLE = 0;
@@ -23,8 +23,8 @@ public class Tower_Defense extends JPanel implements ActionListener, MouseListen
 	
 	//Title
 	private Player player;
-	private String player_name;
-	private int player_race = 2;
+	private String playerName;
+	private int playerRace = 2;
 	private static int EARTH = 0;
 	private static int WATER = 1;
 	private static int AIR = 2;
@@ -40,13 +40,12 @@ public class Tower_Defense extends JPanel implements ActionListener, MouseListen
 	private Timer transitioner = new Timer(1000, this);
 	
 	//Prologue
-	private Timer prologue_typer = new Timer(25, this);
-	private JLabel prologue_text = new JLabel("", SwingConstants.CENTER);
+	private Timer prologueTyper = new Timer(25, this);
+	private JLabel prologueText = new JLabel("", SwingConstants.CENTER);
 	
 	
 	//Invasion
 	private MapGeneration environment;
-	
 	
 	private JFrame frame = new JFrame();
 	private JPanel textBox = new JPanel();
@@ -62,12 +61,12 @@ public class Tower_Defense extends JPanel implements ActionListener, MouseListen
 	
 	//Until I figure out what is going on...
 	JButton bottomButtons[] = new JButton[6];
-	private JLabel bottom_text = new JLabel("Select a difficulty level!", SwingConstants.CENTER);
+	private JLabel bottomText = new JLabel("Select a difficulty level!", SwingConstants.CENTER);
 	
 	private Wave spawnedWave;
 	private boolean waveActive = false;
-	private Timer enemy_mover = new Timer(26, this);
-	private Timer enemy_moverX2 = new Timer(13, this);
+	private Timer enemyMover = new Timer(26, this);
+	private Timer enemyMoverX2 = new Timer(13, this);
 	private boolean fastPaced = false;
 	private int waveNumber = 0;
 	
@@ -79,7 +78,7 @@ public class Tower_Defense extends JPanel implements ActionListener, MouseListen
 	private Image background;
 	
 	
-	public Tower_Defense(){
+	public TowerDefense(){
 			
 		setPreferredSize(new Dimension(800, 600));
 		canvas.add(this);
@@ -91,17 +90,17 @@ public class Tower_Defense extends JPanel implements ActionListener, MouseListen
 		
 		//Prologue
 		//fullProlougeText();
-		//prologue_text.setForeground(Color.WHITE);
-		textBox.add(prologue_text, BorderLayout.NORTH);
-		//prologue_typer.start();		
+		//prologueText.setForeground(Color.WHITE);
+		textBox.add(prologueText, BorderLayout.NORTH);
+		//prologueTyper.start();		
 		
 		//music();
 		
 		//Invasion
-		textBox.remove(prologue_text);
+		textBox.remove(prologueText);
 		//textBox.setLayout(new BorderLayout());
 		
-		player = new Player(player_race);
+		player = new Player(playerRace);
 		lifeAndMoneyDisplay = new JLabel("Lives: <3 "+player.getLives()+"\nGold: $ "+player.getGold(), SwingConstants.RIGHT);
 		
 		environment = new MapGeneration();
@@ -118,7 +117,7 @@ public class Tower_Defense extends JPanel implements ActionListener, MouseListen
 		glassDisplay[1] = new BombTurret(650, 100);
 		glassDisplay[2] = new RayTurret(690, 100);
 		glassDisplay[3] = new ComTurret(730, 100);
-		glassDisplay[4] = new RacialTurret(player_race, 770, 100);
+		glassDisplay[4] = new RacialTurret(playerRace, 770, 100);
 		
 		bottomButtons[0] = new JButton("Easy");
 		bottomButtons[1] = new JButton("Normal");
@@ -127,10 +126,10 @@ public class Tower_Defense extends JPanel implements ActionListener, MouseListen
 		bottomButtons[4] = new JButton("Spawn Wave");
 		bottomButtons[5] = new JButton("Speed x 2");
 		
-		bottom_text.setForeground(Color.WHITE);
-		bottom_text.setText("Select a difficulty level!");
-		bottom_text.setFont(new Font("Serif", Font.BOLD, 20));
-		textBox.add(bottom_text);
+		bottomText.setForeground(Color.WHITE);
+		bottomText.setText("Select a difficulty level!");
+		bottomText.setFont(new Font("Serif", Font.BOLD, 20));
+		textBox.add(bottomText);
 		
 		lifeAndMoneyDisplay.setForeground(Color.WHITE);
 		lifeAndMoneyDisplay.setFont(new Font("Serif", Font.BOLD, 24));
@@ -201,31 +200,31 @@ public class Tower_Defense extends JPanel implements ActionListener, MouseListen
 			if (!waveActive){
 				waveNumber++;
 				spawnedWave = new Wave(waveNumber, false, difficultyLevel);
-				bottom_text.setText("Wave Number: " + waveNumber);
+				bottomText.setText("Wave Number: " + waveNumber);
 				bottomButtons[5].setVisible(true);
 				waveActive = true;
 				bottomButtons[4].setEnabled(false);
 				bottomButtons[5].setEnabled(true);
 				if (!fastPaced){
-					enemy_mover.start();
+					enemyMover.start();
 				}
 				else{
-					enemy_moverX2.start();
+					enemyMoverX2.start();
 				}
 			}
 		}
 		
 		else if (source == bottomButtons[5]){
 			if (!fastPaced){
-				enemy_mover.stop();
+				enemyMover.stop();
 				bottomButtons[5].setText("Speed x 1");
-				enemy_moverX2.start();
+				enemyMoverX2.start();
 				fastPaced = true;
 			}
 			else{
-				enemy_moverX2.stop();
+				enemyMoverX2.stop();
 				bottomButtons[5].setText("Speed x 2");
-				enemy_mover.start();
+				enemyMover.start();
 				fastPaced = false;
 			}
 		}
@@ -233,11 +232,11 @@ public class Tower_Defense extends JPanel implements ActionListener, MouseListen
 		else if (source == transitioner){
 			
 		}
-		else if (source == prologue_typer){
+		else if (source == prologueTyper){
 			
 		}
 		
-		if (source == enemy_mover || source == enemy_moverX2){
+		if (source == enemyMover || source == enemyMoverX2){
 			spawnedWave.enemyMover();
 			wavePresence();
 			checkLossOfLife();
@@ -258,10 +257,10 @@ public class Tower_Defense extends JPanel implements ActionListener, MouseListen
 			bottomButtons[5].setEnabled(false);
 			waveActive = false;
 			if (!fastPaced){
-				enemy_mover.stop();
+				enemyMover.stop();
 			}
 			else{
-				enemy_moverX2.stop();
+				enemyMoverX2.stop();
 			}
 		}
 	}
@@ -288,7 +287,7 @@ public class Tower_Defense extends JPanel implements ActionListener, MouseListen
 	}
 	
 	public void difficultySelection(){
-		bottom_text.setText("Now spawn the wave!");
+		bottomText.setText("Now spawn the wave!");
 		int loop;
 		for(loop = 0; loop < 4; loop++){
 			textBoxButtons.remove(bottomButtons[loop]);
@@ -300,14 +299,14 @@ public class Tower_Defense extends JPanel implements ActionListener, MouseListen
 	public void gameOver(){
 		textBoxButtons.remove(bottomButtons[4]);
 		textBoxButtons.remove(bottomButtons[5]);
-		bottom_text.setText("GG. ");
+		bottomText.setText("GG. ");
 		if (waveActive){
 			waveActive = false;
 			if (!fastPaced){
-				enemy_mover.stop();
+				enemyMover.stop();
 			}
 			else{
-				enemy_moverX2.stop();
+				enemyMoverX2.stop();
 			}
 		}
 	}
@@ -341,7 +340,7 @@ public class Tower_Defense extends JPanel implements ActionListener, MouseListen
 						turretBuilder.add(new ComTurret(mX-13, mY-13));
 					}
 					else if (glassDisplay[loop].turretType() == "Racial"){
-						turretBuilder.add(new RacialTurret(player_race, mX-13, mY-13));
+						turretBuilder.add(new RacialTurret(playerRace, mX-13, mY-13));
 					}
 					if (turretBuilder.get(turretsPlaced).buy() > player.getGold()){
 
@@ -392,7 +391,7 @@ public class Tower_Defense extends JPanel implements ActionListener, MouseListen
 						turretBuilder.add(new ComTurret(mX-13, mY-13));
 					}
 					else{
-						turretBuilder.add(new RacialTurret(player_race, mX-13, mY-13));
+						turretBuilder.add(new RacialTurret(playerRace, mX-13, mY-13));
 					}
 					if (turretBuilder.get(turretsPlaced).buy() > player.getGold()){
 
@@ -534,11 +533,11 @@ public class Waves{
 	}
 
 	public static void main (String[] args){
-		new Tower_Defense();
+		new TowerDefense();
 	}
 	
 	public void fullProlougeText(){
-		prologue_text.setText("\t The stardate is 2505. General Ivan Nomundo, who goes by the name “Evil Overlord”, is currently massing a force to attack the Yvinian Galaxy. He is targeting this specific galaxy because of the rare earth found in the middle of it. With this resource, Xzoltinium, mined, the Evil Overlord plans to use it to conquer everything, everywhere, and everyone. \n \n\tYou have recently been recruited by G.O.D., also known as the Galaxy’s Operational Defense, to take care of Ivan before he can retrieve the rare material. The Yvinians have given you their galaxy and their entire arsenal of prototype rift weapons, able to shoot in space, lucky that, huh? It will be up to you to save life as we know it. So... are you ready?");
+		prologueText.setText("\t The stardate is 2505. General Ivan Nomundo, who goes by the name 'Evil Overlord', is currently massing a force to attack the Yvinian Galaxy. He is targeting this specific galaxy because of the rare earth found in the middle of it. With this resource, Xzoltinium, mined, the Evil Overlord plans to use it to conquer everything, everywhere, and everyone. \n \n\tYou have recently been recruited by G.O.D., also known as the Galaxy's Operational Defense, to take care of Ivan before he can retrieve the rare material. The Yvinians have given you their galaxy and their entire arsenal of prototype rift weapons, able to shoot in space, lucky that, huh? It will be up to you to save life as we know it. So... are you ready?");
 
 		
 	}

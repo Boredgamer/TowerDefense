@@ -17,19 +17,11 @@ public class RacialTurret extends Turret {
 	private static int AIR = 2;
 	private static int FIRE = 3;
 	
-	private int range;
-	private Color color;
-	
 	public RacialTurret(int pRace, int x, int y) {
 		super(x, y);
 		playerRace = pRace;
 		range = 160;
-	}
-	
-	public int buy(){
-		int cost = 40;
-		total_cost += cost;
-		return cost;
+		initialCost = 40;
 	}
 	
 	public String turretType(){
@@ -50,7 +42,7 @@ public class RacialTurret extends Turret {
 	}
 	
 	public int moneyBack(){
-		return (int)total_cost*(4/5);
+		return (int)totalCost*(4/5);
 	}
 	
 	public void changeFocus(boolean focus){

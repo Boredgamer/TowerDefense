@@ -7,8 +7,10 @@ import javax.swing.*;
 
 public class Turret{
 	
-	int total_cost = 0;
+	int totalCost = 0;
+	int initialCost = 0;
 	int size = 20;
+	int range = 0;
 	Color color;
 	int locX;
 	int locY;
@@ -31,7 +33,8 @@ public class Turret{
 	}
 	
 	public int buy(){
-		return total_cost;
+		totalCost = initialCost;
+		return totalCost;
 	}
 	
 	public boolean nearTrack(){

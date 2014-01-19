@@ -8,20 +8,11 @@ public class ComTurret extends Turret {
 	//Communicator(Does not fire, give nearby turrets 10% attack speed, stacks up to 5 times)
 		//Nearby turrets give an extra 3 gold per kill
 		//Nearby turrets gain 10% damage
-	
-	private int range;
-	private Color color;
-
 
 	public ComTurret(int x, int y) {
 		super(x, y);
 		range = 220;
-	}
-	
-	public int buy(){
-		int cost = 50;
-		total_cost += cost;
-		return cost;
+		initialCost = 50;
 	}
 	
 	public String turretType(){
@@ -42,7 +33,7 @@ public class ComTurret extends Turret {
 	}
 	
 	public int moneyBack(){
-		return (int)total_cost*(4/5);
+		return (int)totalCost*(4/5);
 	}
 	
 	public void changeFocus(boolean focus){
