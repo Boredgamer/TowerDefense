@@ -1,7 +1,5 @@
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Rectangle;
-
 
 public class RacialTurret extends Turret {
 
@@ -11,72 +9,28 @@ public class RacialTurret extends Turret {
 		Air - Knockback (1.0 seconds)
 		Fire - Stun (0.5 seconds)*/
 	
-	private int playerRace;
+	private static int playerRace;
 	private static int EARTH = 0;
 	private static int WATER = 1;
 	private static int AIR = 2;
-	private static int FIRE = 3;
+	//private static int FIRE = 3;
 	
-	public RacialTurret(int pRace, int x, int y) {
+	private static int INITIALCOST = 70;
+	
+	public RacialTurret(int x, int y, int pRace) {
 		super(x, y);
 		playerRace = pRace;
-		range = 160;
-		initialCost = 40;
+		range = 164;
+		totalCost += INITIALCOST;
+		firingCoolDown = 32;
 	}
 	
 	public String turretType(){
 		return "Racial";
 	}
 	
-	public void sell(){
-		
-	}
-	
 	public void upgrade(){
 		
-	}
-	
-	public Rectangle turretArea(){
-		turretSquare = new Rectangle(locX-3, locY-3, size+6, size+6);
-		return turretSquare;
-	}
-	
-	public int moneyBack(){
-		return (int)totalCost*(4/5);
-	}
-	
-	public void changeFocus(boolean focus){
-		focused = focus;
-	}
-	
-	public void powered(boolean canShoot){
-		turnedOn = canShoot;
-	}
-	
-	public void shoot(){
-		if (turnedOn){
-			
-		}
-	}
-	
-	public class Ammunition{
-		
-		public Ammunition(){
-		}
-	}
-	
-	public void drawRange(Graphics g, boolean nearTrack){
-		if (focused){
-			g.setColor(new Color(0, 0, 0, 120));
-			g.fillOval(locX-(range/2)-2, locY-(range/2)-2, range+size+4, range+size+4);
-			if (nearTrack){
-				g.setColor(new Color(6, 65, 105, 120));
-			}
-			else{
-				g.setColor(new Color(178, 34, 34, 120));
-			}
-			g.fillOval(locX-(range/2), locY-(range/2), range+size, range+size);
-		}
 	}
 	
 	public void drawTurret(Graphics g){

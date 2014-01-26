@@ -4,27 +4,21 @@ import java.util.ArrayList;
 
 public class Wave {
 	
-	private int status;
-	private static int BASIC = 0;
-	private static int HEAVY = 1;
-	private static int LIGHT = 2;
+	private String status = "Basic";
 	private boolean tenacious;
 	private boolean boss = false;
 	
-	private int waveNumber = 0;
-	private int strengthInNumbers = 10;
+	private int strengthInNumbers = 0;
 	private int difficulty;
 	private static int EASY = 0;
 	private static int NORMAL = 1;
 	private static int HARD = 2;
-	private static int EXPERT = 3;
+	//private static int EXPERT = 3;
 	
 	
-	private int speed = 10;
+	private int speed = 5;
 	private int size = 18;
-	private int health = 50;
-	private int temporaryHealth;
-	private Color enemyC;
+	private int waveHealth = 40;
 	
 	private int enemiesPassed = 0;
 	
@@ -61,13 +55,16 @@ public class Wave {
 		private int RED = 1;
 		
 		private int health;
-		private int gold_value = 10;
+		private int goldValue = 10;
 		private int endpointer = 0;
 		private boolean midPoint = false;
 		private boolean enemyPresence = true;
 		private boolean enemyPassed = false;
 		private boolean presenceCheck = false;
 		private boolean lossOfLife = false;
+		
+		ArrayList<Integer> bulletIDs = new ArrayList<Integer>();
+		private boolean firedAt = false;
 		
 		private Color enemyColor;
 		
@@ -83,7 +80,7 @@ public class Wave {
 				velocityX = -speed;
 				direction = LEFT;
 				enemyColor = Color.BLUE;
-				x += 50*spacing;
+				x += 100*spacing;
 			}
 			else{
 				x = 550;
@@ -97,22 +94,44 @@ public class Wave {
 			enemyX = x - size/2;
 			enemyY = y - size/2;
 			
-			health = temporaryHealth;
 			if (boss){
-				gold_value *= 10;
+				goldValue *= 10;
 			}			
+			
+			health = waveHealth;
 		}
 		
-		public void wasAttacked(int dmg){
+		public void lockOn(int bulletNumber){
+			bulletIDs.add(bulletNumber);
+			//firedAt = true;
+		}
+		
+		public boolean checkLockOn(int bulletNumber){
+			int loop;
+			for (loop = 0; loop < bulletIDs.size(); loop++){
+				if (bulletIDs.get(loop) == bulletNumber){
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		public void wasAttacked(int dmg, int bulletNumber){
 			health -= dmg;
+			if (bulletIDs.size() == 0){
+			}
 			if (health <= 0){
 				death();
 			}
 		}
 		
-		public int death(){
+		public void death(){
+			firedAt = false;
 			enemyPresence = false;
-			return gold_value;
+		}
+		
+		public int moneySalvaged(){
+			return goldValue;
 		}
 		
 		
@@ -269,6 +288,14 @@ public class Wave {
 			}
 		}
 		
+		public int getLocX(){
+			return enemyX;
+		}
+		
+		public int getLocY(){
+			return enemyY;
+		}
+		
 		public void enemyPass(){
 			enemyPresence = false;
 			enemyPassed = true;
@@ -361,17 +388,24 @@ public class Wave {
 		}
 	}
 
-	public Wave(int waveNumber, boolean tough, int d){
-		//status = stats;
-		tenacious = tough;
+	public Wave(int waveNumber, int d){
 		difficulty = d;
-		
-		health += waveNumber*10;
-		temporaryHealth = health;
+		waveHealth += waveNumber*10;	
+		strengthInNumbers += waveNumber;
 		
 		if (waveNumber % 10 == 0){
 			boss = true;
 			strengthInNumbers = 1;
+		}
+		
+		if (waveNumber % 3 == 0){
+			status = "Heavy";
+		}
+		else if(waveNumber % 4 == 0){
+			status = "Light";
+		}
+		if (waveNumber % 5 == 0){
+			tenacious = true;
 		}
 		
 		findEndpoints();
@@ -389,18 +423,22 @@ public class Wave {
 	}
 	
 	public void statusChanger(){
-		if (status == HEAVY){
+		if (status == "Heavy"){
 			speed /= 2;
-			temporaryHealth *= 2;
+			waveHealth *= 2;
 		}
-		else if(status == LIGHT){
+		else if(status == "Light"){
 			speed *= 2;
-			temporaryHealth /= 2;
+			waveHealth /= 2;
 		}
 		if (boss){
 			size *= 2;
-			temporaryHealth *= 5;
+			waveHealth *= 5;
 		}
+	}
+	
+	public String getStatus(){
+		return status;
 	}
 	
 	public boolean getTenacity(){
@@ -519,10 +557,14 @@ public class Wave {
 		
 	}
 	
+	public int getSize(){
+		return size;
+	}
+	
 	public int checkPresence(){
 		int loop;
-		for (loop = 0; loop < strengthInNumbers; loop++){
-				if (!enemiesPresent.get(loop).stillPresent() && !enemiesPresent.get(loop).gotChecked()){
+		for (loop = 0; loop < enemiesPresent.size(); loop++){
+				if (!enemiesPresent.get(loop).stillPresent() && !enemiesPresent.get(loop).gotChecked() && enemiesPresent.get(loop).portalPassing()){
 					enemiesPassed++;
 					enemiesPresent.get(loop).nowChecked();
 				}
@@ -532,18 +574,18 @@ public class Wave {
 	
 	public int enemyStrength(){
 		int loop;
-		for (loop = 0; loop < strengthInNumbers; loop++){
+		for (loop = 0; loop < enemiesPresent.size(); loop++){
 				if (!enemiesPresent.get(loop).stillPresent() && !enemiesPresent.get(loop).gotChecked()){
 					enemiesPassed++;
 					enemiesPresent.get(loop).nowChecked();
 				}
 		}
-		return strengthInNumbers;
+		return enemiesPresent.size();
 	}
 	
 	public boolean lossOfLife(){
 		int loop;
-		for (loop = 0; loop < strengthInNumbers; loop++){
+		for (loop = 0; loop < enemiesPresent.size(); loop++){
 				if (enemiesPresent.get(loop).portalPassing() && !enemiesPresent.get(loop).lifeLost()){
 					enemiesPresent.get(loop).lifeRemoved();
 					return true;
@@ -557,16 +599,6 @@ public class Wave {
 	}
 	
 	public void drawWave(Graphics g){
-		//waveC = Color.GRAY;
-		if (status == HEAVY){
-			enemyC = Color.DARK_GRAY;
-		}
-		else if (status == LIGHT){
-			enemyC = Color.LIGHT_GRAY;
-		}
-		else if (boss){
-			enemyC = Color.BLACK;
-		}
 		int loop;
 		for (loop = 0; loop < enemiesPresent.size(); loop++){
 				enemiesPresent.get(loop).drawEnemy(g);

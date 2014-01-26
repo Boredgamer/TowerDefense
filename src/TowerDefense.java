@@ -1,18 +1,18 @@
 //Credits
-//Tristan L. = Writer
-//Leo L. = Coder and Designer
+//Tristan Lutgen = Lore Writer
+//Leo London = Coder and Designer
+//Kevin London = Coding Contributer
 
 //Special Thanks
 //Stack Overflow for Images
+//Oracle for FontMetrics
 //Mr. Wile for awesome
-
 
 import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-
 
 public class TowerDefense extends JPanel implements ActionListener, MouseListener, MouseMotionListener{
 
@@ -24,11 +24,11 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 	//Title
 	private Player player;
 	private String playerName;
-	private int playerRace = 2;
-	private static int EARTH = 0;
-	private static int WATER = 1;
-	private static int AIR = 2;
-	private static int FIRE = 3;
+	private int playerRace = 0;
+	//private static int EARTH = 0;
+	//private static int WATER = 1;
+	//private static int AIR = 2;
+	//private static int FIRE = 3;
 	
 	private int difficultyLevel;
 	private static int EASY = 0;
@@ -55,6 +55,7 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 	
 	Turret glassDisplay[] = new Turret[5];
 	ArrayList<Turret> turretBuilder = new ArrayList<Turret>();
+	ArrayList<Ammunition> shotsFired = new ArrayList<Ammunition>();
 	private boolean holdingTurret = false;
 	private Timer turretHolder = new Timer(1, this);
 	private int turretsPlaced = 0;
@@ -65,15 +66,16 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 	
 	private Wave spawnedWave;
 	private boolean waveActive = false;
-	private Timer enemyMover = new Timer(26, this);
-	private Timer enemyMoverX2 = new Timer(13, this);
+	private Timer enemyMover = new Timer(30, this);
+	private Timer enemyMoverX2 = new Timer(15, this);
+	private Timer bulletTime = new Timer(4, this);
+	private Timer bulletTimeX2 = new Timer(2, this);
 	private boolean fastPaced = false;
 	private int waveNumber = 0;
+	private boolean gameActive = true;
 	
 	private int mX;
 	private int mY;
-	
-	private JLabel lifeAndMoneyDisplay;
 	
 	private Image background;
 	
@@ -101,9 +103,10 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 		//textBox.setLayout(new BorderLayout());
 		
 		player = new Player(playerRace);
-		lifeAndMoneyDisplay = new JLabel("Lives: <3 "+player.getLives()+"\nGold: $ "+player.getGold(), SwingConstants.RIGHT);
 		
 		environment = new MapGeneration();
+		
+		bottomScreen.setLayout(new BorderLayout());
 		
 		bottomScreen.setPreferredSize(new Dimension(600, 80));
 		bottomScreen.setBackground(new Color(105, 56, 6));
@@ -117,7 +120,7 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 		glassDisplay[1] = new BombTurret(650, 100);
 		glassDisplay[2] = new RayTurret(690, 100);
 		glassDisplay[3] = new ComTurret(730, 100);
-		glassDisplay[4] = new RacialTurret(playerRace, 770, 100);
+		glassDisplay[4] = new RacialTurret(770, 100, playerRace);
 		
 		bottomButtons[0] = new JButton("Easy");
 		bottomButtons[1] = new JButton("Normal");
@@ -130,10 +133,6 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 		bottomText.setText("Select a difficulty level!");
 		bottomText.setFont(new Font("Serif", Font.BOLD, 20));
 		textBox.add(bottomText);
-		
-		lifeAndMoneyDisplay.setForeground(Color.WHITE);
-		lifeAndMoneyDisplay.setFont(new Font("Serif", Font.BOLD, 24));
-		add(lifeAndMoneyDisplay, BorderLayout.NORTH);
 		
 		int loop;
 		for(loop = 0; loop < 6; loop++){
@@ -152,7 +151,7 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 		
 		addMouseListener(this);
 		addMouseMotionListener(this);
-		
+
 		frame.pack();
 		frame.setVisible(true);
 	}
@@ -199,18 +198,26 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 		else if (source == bottomButtons[4]){
 			if (!waveActive){
 				waveNumber++;
-				spawnedWave = new Wave(waveNumber, false, difficultyLevel);
-				bottomText.setText("Wave Number: " + waveNumber);
+				spawnedWave = new Wave(waveNumber, difficultyLevel);
+				if (!spawnedWave.getTenacity()){
+					bottomText.setText("Wave Number: " + waveNumber + ", Status: "+spawnedWave.getStatus());
+				}
+				else{
+					bottomText.setText("Wave Number: " + waveNumber + ", Status: " + spawnedWave.getStatus() + " and Tenacious (Resists Racial Turrets)");
+				}
 				bottomButtons[5].setVisible(true);
 				waveActive = true;
 				bottomButtons[4].setEnabled(false);
 				bottomButtons[5].setEnabled(true);
 				if (!fastPaced){
 					enemyMover.start();
+					bulletTime.start();
 				}
 				else{
 					enemyMoverX2.start();
+					bulletTimeX2.start();
 				}
+				
 			}
 		}
 		
@@ -243,10 +250,46 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 			repaint();
 		}
 		
+		if (source == bulletTime || source == bulletTimeX2){
+			checkTurretRanges();
+			int loop;
+			int moveLoop;
+			for (loop = 0; loop < shotsFired.size(); loop++){
+				shotsFired.get(loop).targetTracker(spawnedWave.enemiesPresent.get(0).getLocX()+spawnedWave.getSize()/2, spawnedWave.enemiesPresent.get(0).getLocY()+spawnedWave.getSize()/2); 
+				for (moveLoop = 0; moveLoop < 10; moveLoop++){
+					shotsFired.get(loop).move();
+					if (shotsFired.get(loop).bulletHit()){
+						spawnedWave.enemiesPresent.get(0).wasAttacked(shotsFired.get(loop).bulletPower(), loop);
+						if (!spawnedWave.enemiesPresent.get(0).stillPresent() && !spawnedWave.enemiesPresent.get(0).portalPassing()){
+							player.moneyGain(spawnedWave.enemiesPresent.get(0).moneySalvaged());
+							spawnedWave.enemiesPresent.remove(0);
+						}
+						moveLoop = 10;
+						shotsFired.remove(loop);
+					}
+					repaint();
+				}
+			}
+		}
+		
 		if (source == turretHolder){
 			turretBuilder.get(turretsPlaced).updateTurretPosition(mX, mY);
 			turretBuilder.get(turretsPlaced).notOnRoad(environment.Rhoadside(turretBuilder.get(turretsPlaced).turretArea()));
 			repaint();
+		}
+	}
+	
+	public void checkTurretRanges(){
+		int loop;
+		int turretLoop;
+		for (loop = 0; loop < spawnedWave.enemyStrength(); loop++){
+			for (turretLoop = 0; turretLoop < turretBuilder.size(); turretLoop++){
+				turretBuilder.get(turretLoop).coolOff();
+				if (turretBuilder.get(turretLoop).inRange(spawnedWave.enemiesPresent.get(loop).getLocX(), spawnedWave.enemiesPresent.get(loop).getLocY(), spawnedWave.getSize()) && gameActive && turretBuilder.get(turretLoop).turretType() != "Com" &&  turretBuilder.get(turretLoop).firedUp){
+					shotsFired.add(new Ammunition(turretBuilder.get(turretLoop).locX+turretBuilder.get(turretLoop).size, turretBuilder.get(turretLoop).locY+turretBuilder.get(turretLoop).size, spawnedWave.enemiesPresent.get(loop).getLocX()+spawnedWave.getSize()/2, spawnedWave.enemiesPresent.get(loop).getLocY()+spawnedWave.getSize()/2, turretBuilder.get(turretLoop).turretType(), playerRace));
+					turretBuilder.get(turretLoop).readyToFire(false);
+				}
+			}
 		}
 	}
 	
@@ -258,9 +301,11 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 			waveActive = false;
 			if (!fastPaced){
 				enemyMover.stop();
+				bulletTime.stop();
 			}
 			else{
 				enemyMoverX2.stop();
+				bulletTimeX2.stop();
 			}
 		}
 	}
@@ -278,7 +323,7 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 				else{
 					player.loseALife(spawnedWave.lossOfLife());
 				}
-				lifeAndMoneyDisplay.setText("Lives:  <3 "+player.getLives()+"\nGold: $ "+player.getGold());
+				repaint();
 				if (player.getLives() <= 0){
 					gameOver();
 				}
@@ -293,22 +338,14 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 			textBoxButtons.remove(bottomButtons[loop]);
 		}
 		bottomButtons[4].setVisible(true);
-		spawnedWave = new Wave(waveNumber, false, difficultyLevel);
+		spawnedWave = new Wave(waveNumber, difficultyLevel);
 	}
 	
 	public void gameOver(){
 		textBoxButtons.remove(bottomButtons[4]);
 		textBoxButtons.remove(bottomButtons[5]);
 		bottomText.setText("GG. ");
-		if (waveActive){
-			waveActive = false;
-			if (!fastPaced){
-				enemyMover.stop();
-			}
-			else{
-				enemyMoverX2.stop();
-			}
-		}
+		gameActive = false;
 	}
 	
 	public void mouseDragged(MouseEvent e){
@@ -340,15 +377,13 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 						turretBuilder.add(new ComTurret(mX-13, mY-13));
 					}
 					else if (glassDisplay[loop].turretType() == "Racial"){
-						turretBuilder.add(new RacialTurret(playerRace, mX-13, mY-13));
+						turretBuilder.add(new RacialTurret(mX-13, mY-13, playerRace));
 					}
 					if (turretBuilder.get(turretsPlaced).buy() > player.getGold()){
-
-						turretBuilder.remove(turretsPlaced);;
+						turretBuilder.remove(turretsPlaced);
 					}
 					else{
 						player.moneyLoss(turretBuilder.get(turretsPlaced).buy());
-						lifeAndMoneyDisplay.setText("Lives:  <3 "+player.getLives()+"\nGold: $ "+player.getGold());
 						holdingTurret = true;
 						turretHolder.start();
 					}
@@ -391,15 +426,13 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 						turretBuilder.add(new ComTurret(mX-13, mY-13));
 					}
 					else{
-						turretBuilder.add(new RacialTurret(playerRace, mX-13, mY-13));
+						turretBuilder.add(new RacialTurret(mX-13, mY-13, playerRace));
 					}
 					if (turretBuilder.get(turretsPlaced).buy() > player.getGold()){
-
-						turretBuilder.remove(turretsPlaced);;
+						turretBuilder.remove(turretsPlaced);
 					}
 					else{
 						player.moneyLoss(turretBuilder.get(turretsPlaced).buy());
-						lifeAndMoneyDisplay.setText("Lives:  <3 "+player.getLives()+"\nGold: $ "+player.getGold());
 						holdingTurret = true;
 						turretHolder.start();
 					}
@@ -411,6 +444,7 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 			turretHolder.stop();
 			holdingTurret = false;
 			environment.addTurret(mX-13, mY-13);
+			turretBuilder.get(turretsPlaced).powered();
 			turretsPlaced++;
 		}
 		
@@ -526,9 +560,19 @@ public class Waves{
 			for (loop = 0; loop < turretBuilder.size(); loop++){
 				turretBuilder.get(loop).drawRange(g, turretBuilder.get(loop).nearTrack());
 			}
+			for (loop = 0; loop < shotsFired.size(); loop++){
+				shotsFired.get(loop).drawBullet(g);
+			}
+			//Life and Money Displays
 			g.setColor(Color.WHITE);
-			g.setFont(new Font("Serif", Font.BOLD, 20));
-			g.drawString("Lives:  <3 "+player.getLives()+"\nGold: $ "+player.getGold(), 600, 100);
+			g.setFont(new Font("Bell MT", Font.BOLD, 28));
+			FontMetrics metrics = g.getFontMetrics(new Font("Bell MT", Font.BOLD, 28));
+			int hgt = metrics.getHeight();
+			int adv = metrics.stringWidth("Lives: "+player.getLives());
+			g.drawString("Lives: "+player.getLives(), getWidth() - adv, hgt-3);
+			
+			adv = metrics.stringWidth("Gold: "+player.getGold());
+			g.drawString("Gold: "+player.getGold(), getWidth() - adv, hgt*2-3);
 		}
 	}
 
@@ -537,8 +581,7 @@ public class Waves{
 	}
 	
 	public void fullProlougeText(){
-		prologueText.setText("\t The stardate is 2505. General Ivan Nomundo, who goes by the name 'Evil Overlord', is currently massing a force to attack the Yvinian Galaxy. He is targeting this specific galaxy because of the rare earth found in the middle of it. With this resource, Xzoltinium, mined, the Evil Overlord plans to use it to conquer everything, everywhere, and everyone. \n \n\tYou have recently been recruited by G.O.D., also known as the Galaxy's Operational Defense, to take care of Ivan before he can retrieve the rare material. The Yvinians have given you their galaxy and their entire arsenal of prototype rift weapons, able to shoot in space, lucky that, huh? It will be up to you to save life as we know it. So... are you ready?");
-
+		prologueText.setText("\t The stardate is 2505. General Ivan Nomundo, who goes by the name Evil Overlord, is currently massing a force to attack the Yvinian Galaxy. He is targeting this specific galaxy because of the rare earth found in the middle of it. With this resource, Xzoltinium, mined, the Evil Overlord plans to use it to conquer everything, everywhere, and everyone. \n \n\tYou have recently been recruited by G.O.D., also known as the GalaxyÕs Operational Defense, to take care of Ivan before he can retrieve the rare material. The Yvinians have given you their galaxy and their entire arsenal of prototype rift weapons, able to shoot in space, lucky that, huh? It will be up to you to save life as we know it. So... are you ready?");
 		
 	}
 	
