@@ -1,5 +1,4 @@
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
 
 public class RacialTurret extends Turret {
 
@@ -9,31 +8,52 @@ public class RacialTurret extends Turret {
 		Air - Knockback (1.0 seconds)
 		Fire - Stun (0.5 seconds)*/
 	
-	private static int playerRace;
+	private int playerRace;
 	private static int EARTH = 0;
 	private static int WATER = 1;
-	private static int AIR = 2;
+	private static int WIND = 2;
 	//private static int FIRE = 3;
 	
-	private static int INITIALCOST = 70;
+	private static int INITIALCOST = 75;
+	private static int INITIALCOOLDOWN = 250;
 	
 	public RacialTurret(int x, int y, int pRace) {
 		super(x, y);
 		playerRace = pRace;
-		range = 164;
+		range = 174;
 		totalCost += INITIALCOST;
-		firingCoolDown = 32;
+		firingCoolDown = INITIALCOOLDOWN;
 	}
 	
 	public String turretType(){
 		return "Racial";
 	}
 	
-	public void upgrade(){
-		
+	//Draws the Tooltip
+	public void drawRolloverTooltip(Graphics g){	
+		g.setColor(Color.WHITE);
+		g.setFont(new Font("Arial", Font.BOLD, 20));
+		g.drawString("Racial Turret", 605, 305);
+		g.setFont(new Font("Arial", Font.PLAIN, 18));
+		g.drawString("Cost: "+totalCost +" Gold", 605, 330);
+		g.drawString("Range: Moderate", 605, 355);
+		g.drawString("Damage: None", 605, 380);
+		g.drawString("Attack Speed: Very Low", 605, 405);
+		if(playerRace == EARTH){
+			g.drawString("Special: Entomb", 605, 430);
+		}
+		else if(playerRace == WATER){
+			g.drawString("Special: Slow", 605, 430);
+		}
+		else if(playerRace == WIND){
+			g.drawString("Special: Knockback", 605, 430);
+		}
+		else{
+			g.drawString("Special: Stun", 605, 430);
+		}
 	}
 	
-	public void drawTurret(Graphics g){
+	public void drawTurret(Graphics g, boolean faster){
 		g.setColor(Color.BLACK);
 		g.fillRect(locX - 3, locY - 3, size+6,size+6);
 		//color = new Color(250, 246, 200);
@@ -46,7 +66,7 @@ public class RacialTurret extends Turret {
 		else if(playerRace == WATER){
 			color = new Color(76, 113, 224);
 		}
-		else if(playerRace == AIR){
+		else if(playerRace == WIND){
 			color = new Color(250, 250, 250);
 		}
 		else{
@@ -54,5 +74,16 @@ public class RacialTurret extends Turret {
 		}
 		g.setColor(color);
 		g.fillOval(locX, locY, size, size);
+		if (faster){
+			Graphics2D g2 = (Graphics2D) g;
+			g.setColor(Color.BLACK);
+			g2.setStroke(new BasicStroke(5));
+			g.drawLine(locX+size/2, locY+size/2-2, locX+size/2 + 4, locY+size/2+2);
+			g.drawLine(locX+size/2, locY+size/2-2, locX+size/2 - 4, locY+size/2+2);
+			g.setColor(Color.WHITE);
+			g2.setStroke(new BasicStroke(2));
+			g.drawLine(locX+size/2, locY+size/2-2, locX+size/2 + 4, locY+size/2+2);
+			g.drawLine(locX+size/2, locY+size/2-2, locX+size/2 - 4, locY+size/2+2);
+		}
 	}
 }

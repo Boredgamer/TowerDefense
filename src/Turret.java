@@ -1,7 +1,6 @@
 import java.awt.*;
 
 public class Turret{
-	
 
 	protected int totalCost = 0;
 	protected int size = 20;
@@ -15,13 +14,24 @@ public class Turret{
 	protected boolean focused = true;
 	protected boolean turnedOn = false;
 	protected boolean firedUp = false;
-	protected int firingCoolDown;
+	protected int firingCoolDown = 0;
+	protected int maximumShots = 1;
 	private int coolant = 0;
-		
+	private int shotsReady;
+	
 	public Turret(int x, int y){	
 		locX = x;
 		locY = y;
 		turretSquare = new Rectangle(locX-3, locY-3, size+6, size+6);
+	}
+	
+	public void adjustCost(boolean increase){
+		if (increase){
+			totalCost += 5;
+		}
+		else{
+			totalCost -= 5;
+		}
 	}
 	
 	public boolean overTurret(int x, int y){
@@ -36,7 +46,11 @@ public class Turret{
 	}
 	
 	public int sell(){
-		return (int)totalCost*(4/5);
+		return (int)(totalCost*.75);
+	}
+	
+	public int undo(){
+		return totalCost;
 	}
 	
 	public boolean nearTrack(){
@@ -51,6 +65,7 @@ public class Turret{
 		turretSquare = new Rectangle(locX-3, locY-3, size+6, size+6);
 		return turretSquare;
 	}
+
 	
 	public void changeFocus(boolean focus){
 		focused = focus;
@@ -59,6 +74,7 @@ public class Turret{
 	public void powered(){
 		turnedOn = true;
 		firedUp = true;
+		shotsReady = maximumShots;
 	}
 	
 	public void updateTurretPosition(int x, int y){
@@ -68,28 +84,38 @@ public class Turret{
 	
 	
 	public boolean inRange(int x, int y, int locD){
-		int disX = (int)(x + locD/2) - ((locX-range/2) + (range+size)/2); 
+		int disX = (int)(x + locD/2) - ((locX-range/2) + (range+size)/2);
 		int disY = (int)(y + locD/2) - ((locY-range/2) + (range+size)/2); 
 		int radii = locD/2 + (range+size)/2;
 		return (((disX * disX) + (disY * disY)) < (radii * radii));
 	}
 	
-	public void readyToFire(boolean b){
-		firedUp = b;
+	public void loadBlown(){
+		shotsReady--;
+		if(shotsReady == 0){
+			firedUp = false;
+		}
 	}
 	
-	public void coolOff(){
-		if (!firedUp){
+	public void coolOff(boolean buffedUp){
+		if (!firedUp && turnedOn){
 			coolant++;
-			if (coolant == firingCoolDown){
-			firedUp = true;
-			coolant = 0;
+			if (coolant == (int)firingCoolDown*.75 && buffedUp){
+				firedUp = true;
+				coolant = 0;
+				shotsReady = maximumShots;
+			}
+			else if (coolant == firingCoolDown){
+				firedUp = true;
+				coolant = 0;
+				shotsReady = maximumShots;
 			}
 		}
 	}
 	
 	public void drawRange(Graphics g, boolean nearTrack){
 		if (focused){
+			//Turret Range
 			g.setColor(new Color(0, 0, 0, 120));
 			g.fillOval(locX-(range/2), locY-(range/2), range+size, range+size);
 			if (nearTrack){
@@ -102,16 +128,43 @@ public class Turret{
 		}
 	}
 	
-	public void drawTurret(Graphics g){
+	public void drawRolloverTooltip(Graphics g){
+	}
+	
+	public void drawFocus(Graphics g, boolean TextSaysUndo){
+		if(focused){
+			//Tooltip
+			g.setColor(Color.WHITE);
+			g.setFont(new Font("Arial", Font.BOLD, 20));
+			g.drawString(turretType()+" Turret", 605, 305);
+		
+			//Sell or Undo button
+			g.setColor(new Color(0, 81, 138, 100));
+			g.fillRect(620, 500, 160, 80);
+			Graphics2D g2 = (Graphics2D) g;
+			g.setColor(Color.LIGHT_GRAY);
+			g2.setStroke(new BasicStroke(4));
+			g.drawRect(620, 500, 160, 80);
+			g.setFont(new Font("Bell MT", Font.BOLD, 40));
+			FontMetrics metrics = g.getFontMetrics(new Font("Bell MT", Font.BOLD, 40));
+			int adv;
+			if (!TextSaysUndo){
+				adv = metrics.stringWidth("Sell");
+				g.drawString("Sell", 700-adv/2, 555);
+			}
+			else{
+				adv = metrics.stringWidth("Undo");
+				g.drawString("Undo", 700-adv/2, 555);
+			}
+		}
+	}
+	
+	public void drawTurret(Graphics g, boolean faster){
 	}
 	
 	public String turretType(){
-		return "Debug Me! (Main Turret Type)";
+		return "";
 	}
-	
-	public void activity(boolean canShoot){
-	}
-	
 	
 }
 

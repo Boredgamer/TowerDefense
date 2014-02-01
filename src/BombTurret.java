@@ -1,26 +1,36 @@
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
 
 public class BombTurret extends Turret {
-
-	private static int INITIALCOST = 45;
+	
+	private static int INITIALCOST = 50;
+	private static int INITIALCOOLDOWN = 200;
 
 	public BombTurret(int x, int y) {
 		super(x, y);
-		range = 194;
+		range = 214;
 		totalCost += INITIALCOST;
-		firingCoolDown = 40;
+		firingCoolDown = INITIALCOOLDOWN;
+
 	}
 	
 	public String turretType(){
 		return "Bomb";
 	}
 	
-	public void upgrade(){
-		
+	//Draws the Tooltip
+	public void drawRolloverTooltip(Graphics g){	
+		g.setColor(Color.WHITE);
+		g.setFont(new Font("Arial", Font.BOLD, 20));
+		g.drawString("Bomb Turret", 605, 305);
+		g.setFont(new Font("Arial", Font.PLAIN, 18));
+		g.drawString("Cost: "+totalCost +" Gold", 605, 330);
+		g.drawString("Range: High", 605, 355);
+		g.drawString("Damage: High", 605, 380);
+		g.drawString("Attack Speed: Low", 605, 405);
+		g.drawString("Special: None", 605, 430);
 	}
-
-	public void drawTurret(Graphics g){
+	
+	public void drawTurret(Graphics g, boolean faster){
 		g.setColor(Color.BLACK);
 		g.fillRect(locX - 3, locY - 3, size+6,size+6);
 		color = new Color(10, 99, 0);
@@ -29,5 +39,16 @@ public class BombTurret extends Turret {
 		color = Color.ORANGE;
 		g.setColor(color);
 		g.fillOval(locX, locY, size, size);
+		if (faster){
+			Graphics2D g2 = (Graphics2D) g;
+			g.setColor(Color.BLACK);
+			g2.setStroke(new BasicStroke(5));
+			g.drawLine(locX+size/2, locY+size/2-2, locX+size/2 + 4, locY+size/2+2);
+			g.drawLine(locX+size/2, locY+size/2-2, locX+size/2 - 4, locY+size/2+2);
+			g.setColor(Color.WHITE);
+			g2.setStroke(new BasicStroke(2));
+			g.drawLine(locX+size/2, locY+size/2-2, locX+size/2 + 4, locY+size/2+2);
+			g.drawLine(locX+size/2, locY+size/2-2, locX+size/2 - 4, locY+size/2+2);
+		}
 	}
 }

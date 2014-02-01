@@ -1,32 +1,26 @@
 
 public class Player {
 	
-	private static int STARTING_GOLD = 100;
+	private static int STARTING_GOLD = 105;
 	private int gold;
 	private int lives = 100;
 	
-	private int playerRace;
-	//private static int EARTH = 0;
-	//private static int WATER = 1;
-	//private static int AIR = 2;
-	//private static int FIRE = 3;
-	
-	public Player(int pRace){
-		playerRace = pRace;
+	public Player(){
 		gold = STARTING_GOLD;
 	}
 	
-	public void loseALife(boolean passed){
+	public void loseALife(boolean passed, boolean boss){
 		if (passed == true){
-			lives--;
+			if (!boss){
+				lives--;
+			}
+			else{
+				lives -= 10;
+			}
 		}
 		if (lives <= 0){
 			lives = 0;
 		}
-	}
-	
-	public int getRace(){
-		return playerRace;
 	}
 	
 	public int getLives(){

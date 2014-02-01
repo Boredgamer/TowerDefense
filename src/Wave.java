@@ -8,6 +8,7 @@ public class Wave {
 	private boolean tenacious;
 	private boolean boss = false;
 	
+	private int waveNumber;
 	private int strengthInNumbers = 0;
 	private int difficulty;
 	private static int EASY = 0;
@@ -15,8 +16,13 @@ public class Wave {
 	private static int HARD = 2;
 	//private static int EXPERT = 3;
 	
+	private static int EARTH = 0;
+	private static int WATER = 1;
+	private static int WIND = 2;
+	private static int FIRE = 3;
 	
-	private int speed = 5;
+	
+	private int speed = 4;
 	private int size = 18;
 	private int waveHealth = 40;
 	
@@ -24,6 +30,7 @@ public class Wave {
 	
 	ArrayList<Enemy> enemiesPresent = new ArrayList<Enemy>();
 	
+	//Checkpoints for enemy pathing
 	ArrayList<Integer> blueEndpointX = new ArrayList<Integer>();
 	ArrayList<Integer> blueEndpointY = new ArrayList<Integer>();
 	ArrayList<Boolean> blueTurningPoint = new ArrayList<Boolean>();
@@ -32,6 +39,7 @@ public class Wave {
 	ArrayList<Integer> redEndpointY = new ArrayList<Integer>();
 	ArrayList<Boolean> redTurningPoint = new ArrayList<Boolean>();
 	
+	//Enemies in the Wave
 	public class Enemy{
 		
 		private int enemyX;
@@ -55,22 +63,36 @@ public class Wave {
 		private int RED = 1;
 		
 		private int health;
-		private int goldValue = 10;
+		private double percentHealth;
+		private int goldValue = 9;
+		
 		private int endpointer = 0;
+		private int enemyID;
 		private boolean midPoint = false;
 		private boolean enemyPresence = true;
 		private boolean enemyPassed = false;
 		private boolean presenceCheck = false;
 		private boolean lossOfLife = false;
+		private boolean spawned = false;
 		
-		ArrayList<Integer> bulletIDs = new ArrayList<Integer>();
-		private boolean firedAt = false;
+		//Debuffs
+		private boolean jolly = true;
+		private int cc;
+		private boolean entombed = false;
+		private boolean slowed = false;
+		private boolean knockedback = false;
+		private boolean stunned = false;
+		private int recovery = 0;
 		
 		private Color enemyColor;
+		private Color debuffedColor;
 		
 		public Enemy(int d, int spacing){
 			generalDirection = d;
 			path = d;
+			//For ammunition tracking
+			enemyID = spacing;
+			goldValue += waveNumber*2;
 			
 			int x = 0;
 			int y = 0;
@@ -80,7 +102,8 @@ public class Wave {
 				velocityX = -speed;
 				direction = LEFT;
 				enemyColor = Color.BLUE;
-				x += 100*spacing;
+				debuffedColor = Color.CYAN;
+				x += 60*spacing;
 			}
 			else{
 				x = 550;
@@ -88,7 +111,8 @@ public class Wave {
 				velocityX = speed;
 				direction = RIGHT;
 				enemyColor = Color.RED;
-				x -= 50*spacing;
+				debuffedColor = Color.ORANGE;
+				x -= 60*spacing;
 			}
 			
 			enemyX = x - size/2;
@@ -101,55 +125,151 @@ public class Wave {
 			health = waveHealth;
 		}
 		
-		public void lockOn(int bulletNumber){
-			bulletIDs.add(bulletNumber);
-			//firedAt = true;
-		}
-		
-		public boolean checkLockOn(int bulletNumber){
-			int loop;
-			for (loop = 0; loop < bulletIDs.size(); loop++){
-				if (bulletIDs.get(loop) == bulletNumber){
-					return true;
-				}
-			}
-			return false;
-		}
-		
-		public void wasAttacked(int dmg, int bulletNumber){
+		//Subtracts the enemy's health when it is hit and activates any debuffs
+		public void wasAttacked(int dmg, int debuff){
 			health -= dmg;
-			if (bulletIDs.size() == 0){
-			}
 			if (health <= 0){
 				death();
 			}
+			if (dmg == 0 && !tenacious && jolly){
+				cc = debuff;
+				jolly = false;
+				crowdControlled(cc);
+			}
 		}
 		
+		//Determines how the debuff affects the enemy
+		public void crowdControlled(int debuff){
+			if (debuff == EARTH){
+				entombed = true;
+			}
+			else if (debuff == WATER){
+				slowed = true;
+			}
+			else if (debuff == WIND){
+				knockedback = true;
+			}
+			else{
+				stunned = true;
+			}
+		}
+		
+		//Enemy shrugging off the debuff
+		public void debuffRecovery(){
+			recovery++;
+			if (cc == EARTH && recovery >= 80){
+				entombed = false;
+				jolly = true;
+				recovery = 0;
+			}
+			else if (cc == WATER && recovery >= 60){
+				slowed = false;
+				jolly = true;
+				recovery = 0;
+			}
+			else if (cc == WIND && recovery >= 40){
+				knockedback = false;
+				jolly = true;
+				recovery = 0;
+			}
+			else if(cc == FIRE && recovery >= 20){
+				stunned = false;
+				jolly = true;
+				recovery = 0;
+			}
+		}
+		
+		//Returns the tracking ID
+		public int getID(){
+			return enemyID;
+		}
+		
+		//Makes the enemy no longer present
 		public void death(){
-			firedAt = false;
 			enemyPresence = false;
+			spawned = false;
 		}
 		
+		//Returns the money received from killing the enemy
 		public int moneySalvaged(){
 			return goldValue;
 		}
 		
+		//Returns if the enemy has passed its respective portal and is shootable
+		public boolean getSpawned(){
+			return spawned;
+		}
 		
+		//Draw method for enemy if it has passed its respective portal and is shootable
 		public void drawEnemy(Graphics g){
 			g.setColor(enemyColor);
-			if (path == BLUE && enemyPresence && enemyX+size/2 >= blueEndpointX.get(0) && (endpointer != 0 || generalDirection == BACKWARD)){
-				g.fillOval(enemyX, enemyY, size, size);
+			if (!jolly){
+				g.setColor(debuffedColor);
 			}
-			else if (path == RED && enemyPresence && enemyX+size/2 <= redEndpointX.get(0) && (endpointer != 0 || generalDirection == FORWARD)){
+			if (path == BLUE && enemyPresence && enemyX >= 0 && (endpointer != 0 || generalDirection == BACKWARD)){
 				g.fillOval(enemyX, enemyY, size, size);
+				drawHealth(g);
+				spawned = true;
+				
 			}
+			else if (path == RED && enemyPresence && enemyX+size<= 600 && (endpointer != 0 || generalDirection == FORWARD)){
+				g.fillOval(enemyX, enemyY, size, size);
+				drawHealth(g);
+				spawned = true;
+			}
+		}
+		
+		//Draw method for the health of the enemy
+		public void drawHealth(Graphics g){
+			percentHealth = (double)health/waveHealth;
 			
+			//Draws Outer Rectangles
+			g.setColor(Color.BLACK);
+			g.fillRect(enemyX - 4, enemyY - 14, size+8, 10);
+	
+			//Draws Inner Rectangle
+			g.setColor(new Color(0, 204, 0));
+			if (percentHealth <= .2){
+				g.setColor(new Color(204, 0, 0));
+			}
+			g.fillRect(enemyX - 3, enemyY - 13, (int)((size+6)*percentHealth), 8);
 			
 		}
 		
+		public boolean entombment(){
+			return entombed;
+		}
+		
+		public boolean skipping(){
+			return jolly;
+		}
+		
+		//Moves the enemy based on its velocity and turns it if a checkpoint is reached
 		public void move(){
-			enemyX += velocityX;
-			enemyY += velocityY;
+			if (slowed){
+				enemyX += velocityX/2;
+				enemyY += velocityY/2;
+			}
+			else if (knockedback){
+				enemyX -= velocityX;
+				enemyY -= velocityY;
+				if (enemyX <= 0){
+					enemyX = 0;
+				}
+				else if (enemyX +size >= 600){
+					enemyX = 600 - size;
+				}
+				else if (enemyY <= 0){
+					enemyY = 0;
+				}
+				else if (enemyY +size >= 600){
+					enemyY = 600 - size;
+				}
+			}
+			else if (!entombed && !stunned){
+				enemyX += velocityX;
+				enemyY += velocityY;
+			}
 			
 			//Purple Portal
 			if (generalDirection == FORWARD && enemyX+size/2 >= blueEndpointX.get(endpointer) && endpointer == 10 && !midPoint){
@@ -286,48 +406,59 @@ public class Wave {
 					reverseEnder();
 				}
 			}
+			if (!jolly){
+				debuffRecovery();
+			}
 		}
 		
+		//Returns the X coordinate of the enemy's position
 		public int getLocX(){
 			return enemyX;
 		}
 		
+		//Returns the Y coordinate of the enemy's position
 		public int getLocY(){
 			return enemyY;
 		}
 		
+		//Checks if an enemy has ended its path and was not killed
 		public void enemyPass(){
 			enemyPresence = false;
-			enemyPassed = true;
-			
-			enemyColor = new Color (0, 0, 0, 0);
+			enemyPassed = true;	
+			spawned = false;
 		}
 		
+		//Returns if the enemy's path is ended and was not killed
 		public boolean portalPassing(){
 			return enemyPassed;
 		}
 		
+		//Returns if the enemy is still present on the map
 		public boolean stillPresent(){
 			return enemyPresence;
 		}
 		
+		//Returns if the enemy was checked for its presence
 		public boolean gotChecked(){
 			return presenceCheck;
 		}
 		
+		//Shows the check for presence is done
 		public void nowChecked(){
 			presenceCheck = true;
 		}
 		
+		//Returns if the player has lost a life or a 10 lives if the enemy is a boss
 		public boolean lifeLost(){
 			return lossOfLife;
 		}
 		
+		//Makes sure the enemy does not remove more than the intended amount of lives
 		public void lifeRemoved(){
 			lossOfLife = true;
 		}
 		
-		
+		//Changes the course of the enemy if the difficulty is EASY or HARD to return to its original portal
 		public void reverseEnder(){
 			if (midPoint){
 				if (endpointer != 0){
@@ -340,6 +471,7 @@ public class Wave {
 			}
 		}
 		
+		//Changes the direction of the enemy if it reaches a checkpoint
 		public void changeDirection(boolean turnLeft){
 			if (direction == UP){
 				velocityX = velocityY;
@@ -388,7 +520,8 @@ public class Wave {
 		}
 	}
 
-	public Wave(int waveNumber, int d){
+	public Wave(int n, int d){
+		waveNumber = n;
 		difficulty = d;
 		waveHealth += waveNumber*10;	
 		strengthInNumbers += waveNumber;
@@ -413,6 +546,7 @@ public class Wave {
 		enemySpawner();
 	}
 	
+	//Moves each enemy
 	public void enemyMover(){
 		int loop;
 		for (loop = 0; loop < enemiesPresent.size(); loop++){
@@ -422,6 +556,7 @@ public class Wave {
 		}
 	}
 	
+	//Changes stats based on status
 	public void statusChanger(){
 		if (status == "Heavy"){
 			speed /= 2;
@@ -437,10 +572,12 @@ public class Wave {
 		}
 	}
 	
+	//Returns the status of the enemies
 	public String getStatus(){
 		return status;
 	}
 	
+	//Returns if the enemies resist racial turrets
 	public boolean getTenacity(){
 		return tenacious;
 	}
@@ -448,13 +585,11 @@ public class Wave {
 	public void enemySpawner(){
 		int spawnerLoop;
 		int randomDirection;
-		if (difficulty == EASY || difficulty == NORMAL){
-			for (spawnerLoop = 0; spawnerLoop < strengthInNumbers; spawnerLoop++){
+		for (spawnerLoop = 0; spawnerLoop < strengthInNumbers; spawnerLoop++){
+			if (difficulty == EASY || difficulty == NORMAL){
 				enemiesPresent.add(new Enemy(0, spawnerLoop));
 			}
-		}
-		else{
-			for (spawnerLoop = 0; spawnerLoop < strengthInNumbers; spawnerLoop++){
+			else{
 				randomDirection = (int)((100)*Math.random() + 1);
 				if (randomDirection >= 50){
 					enemiesPresent.add(new Enemy(0, spawnerLoop));
@@ -466,6 +601,7 @@ public class Wave {
 		}
 	}
 	
+	//Lists the checkpoints for the enemy pathing
 	public void findEndpoints(){
 		//Point 0
 		blueEndpointX.add(50);
@@ -557,10 +693,34 @@ public class Wave {
 		
 	}
 	
+	//Returns the physical size of the enemies
 	public int getSize(){
 		return size;
 	}
 	
+	//Returns if the targeted enemy is still present
+	public boolean IDscanner(int trackingNumber){
+		int loop;
+		for (loop = 0; loop < enemiesPresent.size(); loop++){
+				if (enemiesPresent.get(loop).getID() == trackingNumber){
+					return true;
+				}
+		}
+		return false;
+	}
+	
+	//Returns the position in the enemiesPresent ArrayList of the targeted enemy
+	public int IDTracker(int trackingNumber){
+		int loop;
+		for (loop = 0; loop < enemiesPresent.size(); loop++){
+				if (enemiesPresent.get(loop).getID() == trackingNumber){
+					return loop;
+				}
+		}
+		return 0;
+	}
+	
+	//Check which enemies went through the portal
 	public int checkPresence(){
 		int loop;
 		for (loop = 0; loop < enemiesPresent.size(); loop++){
@@ -572,6 +732,7 @@ public class Wave {
 		return enemiesPassed;	
 	}
 	
+	//Check the number of remaining enemies
 	public int enemyStrength(){
 		int loop;
 		for (loop = 0; loop < enemiesPresent.size(); loop++){
@@ -583,6 +744,8 @@ public class Wave {
 		return enemiesPresent.size();
 	}
 	
+	//If an enemy passes, the player losses a life for each enemy
+	//If the enemy is a boss, 10 lives are lost
 	public boolean lossOfLife(){
 		int loop;
 		for (loop = 0; loop < enemiesPresent.size(); loop++){
@@ -594,10 +757,7 @@ public class Wave {
 		return false;
 	}
 	
-	public void playerVictory(){
-		
-	}
-	
+	//Draws each enemy
 	public void drawWave(Graphics g){
 		int loop;
 		for (loop = 0; loop < enemiesPresent.size(); loop++){

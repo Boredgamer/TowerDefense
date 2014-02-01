@@ -1,5 +1,4 @@
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
 
 public class RayTurret extends Turret {
 	
@@ -7,24 +6,35 @@ public class RayTurret extends Turret {
 		//Increases damage and attack speed over time 
 		//Doubles amount of beams 
 
-	private static int INITIALCOST =  70;
+	private static int INITIALCOST =  75;
+	private static int INITIALCOOLDOWN = 150;
 
 	public RayTurret(int x, int y) {
 		super(x, y);
-		range = 164;
+		range = 154;
 		totalCost += INITIALCOST;
-		firingCoolDown = 28;
+		firingCoolDown = INITIALCOOLDOWN;
+		maximumShots = 3;
 	}
 	
 	public String turretType(){
 		return "Ray";
 	}
 	
-	public void upgrade(){
-		
+	//Draws the Tooltip
+	public void drawRolloverTooltip(Graphics g){	
+		g.setColor(Color.WHITE);
+		g.setFont(new Font("Arial", Font.BOLD, 20));
+		g.drawString("Ray Turret", 605, 305);
+		g.setFont(new Font("Arial", Font.PLAIN, 18));
+		g.drawString("Cost: "+totalCost +" Gold", 605, 330);
+		g.drawString("Range: Low", 605, 355);
+		g.drawString("Damage: Moderate", 605, 380);
+		g.drawString("Attack Speed: Moderate", 605, 405);
+		g.drawString("Special: Multi-shot", 605, 430);
 	}
 	
-	public void drawTurret(Graphics g){
+	public void drawTurret(Graphics g, boolean faster){
 		g.setColor(Color.BLACK);
 		g.fillRect(locX - 3, locY - 3, size+6,size+6);
 		color = new Color(173, 3, 162);
@@ -33,5 +43,16 @@ public class RayTurret extends Turret {
 		color = new Color(200, 200, 255);
 		g.setColor(color);
 		g.fillOval(locX, locY, size, size);
+		if (faster){
+			Graphics2D g2 = (Graphics2D) g;
+			g.setColor(Color.BLACK);
+			g2.setStroke(new BasicStroke(5));
+			g.drawLine(locX+size/2, locY+size/2-2, locX+size/2 + 4, locY+size/2+2);
+			g.drawLine(locX+size/2, locY+size/2-2, locX+size/2 - 4, locY+size/2+2);
+			g.setColor(Color.WHITE);
+			g2.setStroke(new BasicStroke(2));
+			g.drawLine(locX+size/2, locY+size/2-2, locX+size/2 + 4, locY+size/2+2);
+			g.drawLine(locX+size/2, locY+size/2-2, locX+size/2 - 4, locY+size/2+2);
+		}
 	}
 }

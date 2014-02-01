@@ -1,6 +1,6 @@
 import java.awt.*;
 
-public class Ammunition {
+public class Ammunition implements InMySights{
 
 	private static int EARTH = 0;
 	private static int WATER = 1;
@@ -13,13 +13,15 @@ public class Ammunition {
 	private Color bulletColor;
 	private int enemyX;
 	private int enemyY;
+	private int enemyID;
 	private int bulletDamage = 0;
 	private boolean packageRecieved = false;
 	
-	public Ammunition(int originX, int originY, int trackedX, int trackedY, String type, int playerRace) {
+	public Ammunition(int enemyNumber, int originX, int originY, int trackedX, int trackedY, String type, int playerRace) {
 		ammuntionType(type, playerRace);
-		bulletX = originX-bulletSize;
-		bulletY = originY-bulletSize;
+		enemyID = enemyNumber;
+		bulletX = originX-bulletSize/2;
+		bulletY = originY-bulletSize/2;
 		enemyX = trackedX;
 		enemyY = trackedY;
 	}
@@ -27,18 +29,18 @@ public class Ammunition {
 	public void ammuntionType(String type, int playerRace){
 		if (type == "Gun"){
 			bulletColor = Color.LIGHT_GRAY;
-			bulletSize = 8;
-			bulletDamage = 20;
+			bulletSize = 6;
+			bulletDamage = 10;
 		}
 		else if (type == "Bomb"){
 			bulletColor = Color.DARK_GRAY;
 			bulletSize = 14;
-			bulletDamage = 40;
+			bulletDamage = 20;
 		}
 		else if (type == "Ray"){
 			bulletColor = Color.CYAN;
-			bulletSize = 10;
-			bulletDamage = 30;
+			bulletSize = 8;
+			bulletDamage = 15;
 		}
 		else if (type == "Racial"){
 			if (playerRace == EARTH){
@@ -53,17 +55,21 @@ public class Ammunition {
 			else{
 				bulletColor = new Color(255, 125, 74);
 			}
-			bulletSize = 12;
+			bulletSize = 10;
 		}
 	}
 	
-	public int bulletPower(){
+	public int attackDamage(){
 		return bulletDamage;
 	}
 	
 	public void targetTracker(int trackedX, int trackedY){
 		enemyX = trackedX;
 		enemyY = trackedY;
+	}
+	
+	public int getTarget(){
+		return enemyID;
 	}
 	
 	public boolean bulletHit(){

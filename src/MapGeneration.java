@@ -13,10 +13,16 @@ public class MapGeneration {
 	public MapGeneration(){
 	}
 	
+	//Adds a new turret to check for collision
 	public void addTurret(int x, int y){
 		turrets.add(new Rectangle(x, y, 26, 26));
 	}
 	
+	public void removeTurret(int turretID){
+		turrets.remove(turretID);
+	}
+	
+	//Returns if the turret is not on the track
 	public boolean Rhoadside(Rectangle heldTurret){
 		//Turrets
 		int loop;
@@ -103,12 +109,11 @@ public class MapGeneration {
 		if (purplePortal.intersects(heldTurret)){
 			return false;
 		}
-		
 		return true;
 	}
 	
 	
-	
+	//Draws the track
 	public void drawTrack(Graphics g){
 		Graphics2D g2 = (Graphics2D) g;
 		g2.setStroke(new BasicStroke(24));
@@ -178,9 +183,29 @@ public class MapGeneration {
 	
 	}
 	
+	//Draws the shop screen
 	public void drawShop(Graphics g){
+		//Backdrop
 		g.setColor(new Color(6, 65, 105));
 		g.fillRect(600, 0, 200, 600);
+		
+		//Hotkeys List
+		g.setColor(Color.WHITE);
+		g.setFont(new Font("Arial", Font.BOLD, 14));
+		g.drawString("Hotkey List", 665, 150);
+		g.setFont(new Font("Arial", Font.PLAIN, 12));
+		g.drawString("Buy Turret", 620, 170);
+		g.drawRect(617, 173, 60, 105);
+		g.drawString("Q: Gun ", 623, 190);
+		g.drawString("W: Bomb", 623, 210);
+		g.drawString("E: Ray", 623, 230);
+		g.drawString("R: Com", 623, 250);
+		g.drawString("T: Racial", 623, 270);
+		g.drawString("Shift: Sell/Undo", 700, 190);
+		g.drawString("ESC: Unfocus", 700, 210);
+		g.drawString("Space: ", 700, 230);
+		g.drawString("Spawn Wave/", 700, 250);
+		g.drawString("Change Speed", 700, 270);
 		
 	}
 }
