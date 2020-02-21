@@ -34,6 +34,10 @@ public class Turret{
 		}
 	}
 	
+	public int adjustedCost(int turretsPlaced) {
+		return totalCost+(5*turretsPlaced);
+	}
+	
 	public boolean overTurret(int x, int y){
 		if (turretSquare.contains(x, y)){
 			return true;
@@ -45,12 +49,12 @@ public class Turret{
 		return totalCost;
 	}
 	
-	public int sell(){
-		return (int)(totalCost*.75);
+	public int sell(int turretsPlaced){
+		return (int)(adjustedCost(turretsPlaced)*.75);
 	}
 	
-	public int undo(){
-		return totalCost;
+	public int undo(int turretsPlaced){
+		return adjustedCost(turretsPlaced);
 	}
 	
 	public boolean nearTrack(){
@@ -129,6 +133,9 @@ public class Turret{
 	}
 	
 	public void drawRolloverTooltip(Graphics g){
+	}
+	
+	public void drawRolloverTooltip(Graphics g, int rt){
 	}
 	
 	public void drawFocus(Graphics g, boolean TextSaysUndo){

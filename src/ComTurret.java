@@ -3,11 +3,11 @@ import java.awt.*;
 
 public class ComTurret extends Turret {
 	
-	//Communicator(Does not fire, give nearby turrets 10% attack speed, stacks up to 5 times)
+	//Communicator (Does not fire, give nearby turrets 10% attack speed, stacks up to 5 times)
 		//Nearby turrets give an extra 3 gold per kill
 		//Nearby turrets gain 10% damage
 	
-	private static int INITIALCOST = 100;
+	private final int INITIALCOST = 100;
 
 	public ComTurret(int x, int y) {
 		super(x, y);

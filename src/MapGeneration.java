@@ -47,7 +47,7 @@ public class MapGeneration {
 		//Line 1
 		blueLines.add(new Rectangle(38, 315, 24, 235));
 		//Line 2
-		blueLines.add(new Rectangle(50, 538, 488, 24));
+		blueLines.add(new Rectangle(50, 538, 438, 24));
 		//Line 3
 		blueLines.add(new Rectangle(476, 112, 24, 438));
 		//Line 4

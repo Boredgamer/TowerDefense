@@ -2,20 +2,28 @@ import java.awt.*;
 
 public class RacialTurret extends Turret {
 
-	/*Racial turrets(CC, depends on race):
+	/*Racial turrets (CC, depends on race):
 		Earth - Enchamber(2.0 seconds)
 		Water - Slow (1.5 seconds)
 		Air - Knockback (1.0 seconds)
-		Fire - Stun (0.5 seconds)*/
+		Fire - Stun (0.5 seconds)
+		
+		//Increased duration of CC
+		//CC'd enemies take more damage (even Earth)
+		 
+		*Scale attack speed or CC duration  with racialTurretsPlaced?
+		*Alternatively, give global CC player ability based on race (like freeze all)
+		
+		*/
 	
 	private int playerRace;
-	private static int EARTH = 0;
-	private static int WATER = 1;
-	private static int WIND = 2;
+	private final int EARTH = 0;
+	private final int WATER = 1;
+	private final int WIND = 2;
 	//private static int FIRE = 3;
 	
-	private static int INITIALCOST = 75;
-	private static int INITIALCOOLDOWN = 250;
+	private final int INITIALCOST = 75;
+	private final int INITIALCOOLDOWN = 250;
 	
 	public RacialTurret(int x, int y, int pRace) {
 		super(x, y);
@@ -30,7 +38,7 @@ public class RacialTurret extends Turret {
 	}
 	
 	//Draws the Tooltip
-	public void drawRolloverTooltip(Graphics g){	
+	public void drawRolloverTooltip(Graphics g, int rt){	
 		g.setColor(Color.WHITE);
 		g.setFont(new Font("Arial", Font.BOLD, 20));
 		g.drawString("Racial Turret", 605, 305);
@@ -51,6 +59,7 @@ public class RacialTurret extends Turret {
 		else{
 			g.drawString("Special: Stun", 605, 430);
 		}
+		g.drawString("Total: " + rt +"/10", 605, 455);
 	}
 	
 	public void drawTurret(Graphics g, boolean faster){

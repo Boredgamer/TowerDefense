@@ -1,7 +1,7 @@
 
 public class Player {
 	
-	private static int STARTING_GOLD = 105;
+	private final int STARTING_GOLD = 105;
 	private int gold;
 	private int lives = 100;
 	

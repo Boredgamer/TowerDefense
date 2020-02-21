@@ -21,30 +21,30 @@ import java.util.ArrayList;
 public class TowerDefense extends JPanel implements ActionListener, MouseListener, MouseMotionListener, KeyListener{
 
 	private int phase = 0;
-	private static int TITLE = 0;
-	private static int PROLOGUE = 1;
-	private static int INVASION = 2;
+	private final int TITLE = 0;
+	private final int PROLOGUE = 1;
+	private final int INVASION = 2;
 	
 	//Title
 	private Player player;
 	private String playerName;
 	private int playerRace = 0;
-	private static int EARTH = 0;
-	private static int WATER = 1;
-	private static int WIND = 2;
-	private static int FIRE = 3;
+	private final int EARTH = 0;
+	private final int WATER = 1;
+	private final int WIND = 2;
+	private final int FIRE = 3;
 	
 	private int difficultyLevel;
-	private static int EASY = 0;
-	private static int NORMAL = 1;
-	private static int HARD = 2;
-	private static int EXPERT = 3;
+	private final int EASY = 0;
+	private final int NORMAL = 1;
+	private final int HARD = 2;
+	private final int EXPERT = 3;
 	
 	private JTextField name = new JTextField("Smik", 10);
 	private JButton nameInput = new JButton("Submit");
 	
-	private Clip clip;
 	private Clip bgm;
+	
 	
 		
 	//Invasion
@@ -63,6 +63,7 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 	private boolean holdingTurret = false;
 	private Timer turretHolder = new Timer(1, this);
 	private int turretsPlaced = 0;
+	private int racialTurretsPlaced = 0;
 	
 	private JButton bottomButtons[] = new JButton[6];
 	private JLabel bottomText = new JLabel("Please enter your name.", SwingConstants.CENTER);
@@ -138,6 +139,7 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 		bottomButtons[3].setVisible(false);
 		textBox.setVisible(false);
 		phase = PROLOGUE;
+		playSound("Prologue_BGM.wav");
 		repaint();
 	}
 	
@@ -192,6 +194,7 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 		
 		frame.pack();
 		phase = INVASION;
+		stopBGM();
 		playSound("Invasion_BGM.wav");
 		repaint();
 	}
@@ -208,7 +211,7 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 				clip.start();
 			}
 			else{
-				Clip bgm = AudioSystem.getClip();                 
+				bgm = AudioSystem.getClip();                 
 				bgm.open(audioInputStream);           
 				bgm.start();
 				bgm.loop(bgm.LOOP_CONTINUOUSLY);
@@ -218,6 +221,11 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 			System.out.println("Error with playing sound.");          
 			ex.printStackTrace();  
 		} 
+	}
+	
+	//Stops current background music
+	public void stopBGM(){
+		bgm.stop();
 	}
 	
 	public void actionPerformed(ActionEvent a){
@@ -547,20 +555,25 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 				if (glassDisplay[loop].overTurret(mX, mY)){
 					if (glassDisplay[loop].turretType() == "Gun"){
 						turretBuilder.add(new GunTurret(mX-13, mY-13));
+						financeManager();
 					}
 					else if (glassDisplay[loop].turretType() == "Bomb"){
 						turretBuilder.add(new BombTurret(mX-13, mY-13));
+						financeManager();
 					}
 					else if (glassDisplay[loop].turretType() == "Ray"){
 						turretBuilder.add(new RayTurret(mX-13, mY-13));
+						financeManager();
 					}
 					else if (glassDisplay[loop].turretType() == "Com" && turretsPlaced != 0){
 						turretBuilder.add(new ComTurret(mX-13, mY-13));
+						financeManager();
 					}
-					else if (glassDisplay[loop].turretType() == "Racial"){
+					else if (glassDisplay[loop].turretType() == "Racial" && racialTurretsPlaced < 10){
 						turretBuilder.add(new RacialTurret(mX-13, mY-13, playerRace));
+						financeManager();
 					}
-					financeManager();
+					
 				}
 			} 
 		}
@@ -580,11 +593,14 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 		if (!holdingTurret){
 			//Sells the focused turret
 			if (sellOrUndo.contains(mX, mY) && turretTracker() != -1){
-				player.moneyGain(turretBuilder.get(turretTracker()).sell());
+				player.moneyGain(turretBuilder.get(turretTracker()).sell(turretsPlaced-1));
 				for(loop = 0; loop < 5; loop++){
 					glassDisplay[loop].adjustCost(false);
 				}
 				environment.removeTurret(turretTracker());
+				if (turretBuilder.get(turretTracker()).turretType().equals("Racial")) {
+					racialTurretsPlaced--;
+				}
 				turretBuilder.remove(turretTracker());
 				turretsPlaced--;
 			}
@@ -602,20 +618,24 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 				if (glassDisplay[loop].overTurret(mX, mY)){
 					if (glassDisplay[loop].turretType() == "Gun"){
 						turretBuilder.add(new GunTurret(mX-13, mY-13));
+						financeManager();
 					}
 					else if (glassDisplay[loop].turretType() == "Bomb"){
 						turretBuilder.add(new BombTurret(mX-13, mY-13));
+						financeManager();
 					}
 					else if (glassDisplay[loop].turretType() == "Ray"){
 						turretBuilder.add(new RayTurret(mX-13, mY-13));
+						financeManager();
 					}
 					else if (glassDisplay[loop].turretType() == "Com" && turretsPlaced != 0){
 						turretBuilder.add(new ComTurret(mX-13, mY-13));
+						financeManager();
 					}
-					else if(glassDisplay[loop].turretType() == "Racial"){
+					else if(glassDisplay[loop].turretType() == "Racial" && racialTurretsPlaced < 10){
 						turretBuilder.add(new RacialTurret(mX-13, mY-13, playerRace));
+						financeManager();
 					}
-					financeManager();
 					
 				}
 			}
@@ -626,12 +646,15 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 			holdingTurret = false;
 			environment.addTurret(mX-13, mY-13);
 			turretBuilder.get(turretsPlaced).powered();
+			if (turretBuilder.get(turretsPlaced).turretType().equals("Racial")) {
+				racialTurretsPlaced++;
+			}
 			turretsPlaced++;
 		}
 		
 		//Undos purhcase
 		else if (holdingTurret && sellOrUndo.contains(mX, mY)){
-			player.moneyGain(turretBuilder.get(turretTracker()).undo());
+			player.moneyGain(turretBuilder.get(turretTracker()).undo(turretsPlaced));
 			for(loop = 0; loop < 5; loop++){
 				glassDisplay[loop].adjustCost(false);
 			}
@@ -734,12 +757,15 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 		if (!holdingTurret){
 			//Sells the focused turret
 			if (keyID == KeyEvent.VK_SHIFT && turretTracker() != -1){
-				player.moneyGain(turretBuilder.get(turretTracker()).sell());
+				player.moneyGain(turretBuilder.get(turretTracker()).sell(turretsPlaced-1));
 				int loop;
 				for(loop = 0; loop < 5; loop++){
 					glassDisplay[loop].adjustCost(false);
 				}
 				environment.removeTurret(turretTracker());
+				if (turretBuilder.get(turretTracker()).turretType().equals("Racial")) {
+					racialTurretsPlaced--;
+				}
 				turretBuilder.remove(turretTracker());
 				turretsPlaced--;
 			}
@@ -772,7 +798,7 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 				turretBuilder.add(new ComTurret(mX-13, mY-13));
 				financeManager();
 			}
-			else if (keyID == KeyEvent.VK_T){
+			else if (keyID == KeyEvent.VK_T && racialTurretsPlaced < 10){
 				if (turretTracker() != -1){
 					turretBuilder.get(turretTracker()).changeFocus(false);
 				}
@@ -786,7 +812,7 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 		
 		//Undos purhcase
 		if (keyID == KeyEvent.VK_SHIFT && holdingTurret){
-			player.moneyGain(turretBuilder.get(turretTracker()).undo());
+			player.moneyGain(turretBuilder.get(turretTracker()).undo(turretsPlaced));
 			int loop;
 			for(loop = 0; loop < 5; loop++){
 				glassDisplay[loop].adjustCost(false);
@@ -865,7 +891,12 @@ public class TowerDefense extends JPanel implements ActionListener, MouseListene
 				for(loop = 0; loop < 5; loop++){
 					glassDisplay[loop].drawTurret(g, false);
 						if (glassDisplay[loop].overTurret(mX, mY) && !holdingTurret && turretTracker() == -1){
-							glassDisplay[loop].drawRolloverTooltip(g);
+							if (glassDisplay[loop].turretType() == "Racial") {
+								glassDisplay[loop].drawRolloverTooltip(g, racialTurretsPlaced);
+							}
+							else {
+								glassDisplay[loop].drawRolloverTooltip(g);
+							}
 						}
 				}
 				//Draws Turret and the Sell/Undo button and its tooltip

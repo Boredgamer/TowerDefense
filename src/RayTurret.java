@@ -6,8 +6,8 @@ public class RayTurret extends Turret {
 		//Increases damage and attack speed over time 
 		//Doubles amount of beams 
 
-	private static int INITIALCOST =  75;
-	private static int INITIALCOOLDOWN = 150;
+	private final int INITIALCOST =  75;
+	private final int INITIALCOOLDOWN = 150;
 
 	public RayTurret(int x, int y) {
 		super(x, y);

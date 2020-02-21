@@ -11,15 +11,15 @@ public class Wave {
 	private int waveNumber;
 	private int strengthInNumbers = 0;
 	private int difficulty;
-	private static int EASY = 0;
-	private static int NORMAL = 1;
-	private static int HARD = 2;
-	//private static int EXPERT = 3;
+	private final int EASY = 0;
+	private final int NORMAL = 1;
+	private final int HARD = 2;
+	//private final int EXPERT = 3;
 	
-	private static int EARTH = 0;
-	private static int WATER = 1;
-	private static int WIND = 2;
-	private static int FIRE = 3;
+	private final int EARTH = 0;
+	private final int WATER = 1;
+	private final int WIND = 2;
+	private final int FIRE = 3;
 	
 	
 	private int speed = 4;

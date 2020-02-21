@@ -6,8 +6,8 @@ public class GunTurret extends Turret {
 		//Rapid Fire, Faster attack speed
 		//Sniper, Much Longer Range, Piereces for 10% health
 	
-	private static int INITIALCOST = 25;
-	private static int INITIALCOOLDOWN = 100;
+	private final int INITIALCOST = 25;
+	private final int INITIALCOOLDOWN = 100;
 
 	public GunTurret(int x, int y) {
 		super(x, y);

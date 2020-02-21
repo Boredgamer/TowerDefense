@@ -1,11 +1,11 @@
 import java.awt.*;
 
-public class Ammunition implements InMySights{
+public class Ammunition{
 
-	private static int EARTH = 0;
-	private static int WATER = 1;
-	private static int AIR = 2;
-	//private static int FIRE = 3;
+	private final int EARTH = 0;
+	private final int WATER = 1;
+	private final int AIR = 2;
+	//private final int FIRE = 3;
 	
 	private int bulletX;
 	private int bulletY;
@@ -56,6 +56,7 @@ public class Ammunition implements InMySights{
 				bulletColor = new Color(255, 125, 74);
 			}
 			bulletSize = 10;
+			bulletDamage = 1;
 		}
 	}
 	

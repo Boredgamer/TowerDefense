@@ -1,0 +1,19 @@
+1.01
+BGM
+-Metroid prologue BGM now properly functioning as a .wav file over .mp3
+-Prologue BGM stops before Invasion BGM starts
+
+Turrets
+-Racial turrets now have 1 attack power, to prevent infinite cc chains
+-Racial turrets now have a cap of 10 placed turrets
+-Racial shop tooltip displays number of placed racial turrets, as well as the cap
+-Added possible upgrade ideas for Bomb and Racial turrets
+
+Shop
+-Sell and Undo now properly account for inflation (returned gold now scales with cost to buy -- turrets placed)
+
+Map Generation
+-Bottom right corner of blue side no longer extends past the drawn hitbox (which was preventing turret placement)
+
+General
+-Swapped "static" modifiers for "final" (except Main), because apparently I got that wrong initially

@@ -2,8 +2,12 @@ import java.awt.*;
 
 public class BombTurret extends Turret {
 	
-	private static int INITIALCOST = 50;
-	private static int INITIALCOOLDOWN = 200;
+	//Bomb (slow but stronk)
+		//Longer range and short stun on-hit
+		//Bonus damage vs. bosses (1.5x or 2x)
+	
+	private final int INITIALCOST = 50;
+	private final int INITIALCOOLDOWN = 200;
 
 	public BombTurret(int x, int y) {
 		super(x, y);
